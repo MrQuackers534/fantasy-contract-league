@@ -1,0 +1,3361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Fantasy Contract League</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #34d399;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --surface-lighter: #475569;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .app-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            padding-bottom: 0.75rem;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+
+        .btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #fb923c);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #fb923c, var(--accent));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626, var(--danger));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--surface-light);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface-lighter);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .form-input:hover, .form-select:hover {
+            border-color: var(--surface-lighter);
+        }
+
+        .league-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .league-card {
+            background: var(--surface-light);
+            padding: 1.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .league-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .league-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl), 0 0 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .league-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .league-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .league-info {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        .salary-cap-bar {
+            margin-top: 1rem;
+            background: var(--surface-light);
+            border-radius: 12px;
+            overflow: hidden;
+            height: 48px;
+            border: 1px solid var(--border);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .salary-cap-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transition: width 0.3s, background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-weight: 700;
+            font-family: 'Barlow Condensed', sans-serif;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .salary-cap-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        .salary-cap-fill.danger {
+            background: linear-gradient(90deg, #dc2626, var(--danger));
+        }
+
+        .player-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .player-card {
+            background: var(--surface-light);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .player-card:hover {
+            border-color: var(--primary);
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .player-position {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+
+        .auction-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: var(--surface-light);
+            padding: 1.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .stat-value {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        .nav-bar {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-toggle {
+            font-family: 'Barlow Condensed', sans-serif;
+            padding: 0.4rem 0.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-toggle:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .nav-toggle-icon {
+            font-size: 0.65rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-toggle-text {
+            font-size: 0.8rem;
+        }
+
+        .nav-content {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-content.collapsed {
+            display: none;
+        }
+
+        .nav-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            padding: 0.75rem 1.5rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-md), 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.5px;
+        }
+
+        .badge-guaranteed {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .badge-non-guaranteed {
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+            color: white;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.75rem 1.25rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .radio-label:hover {
+            border-color: var(--primary);
+            background: var(--surface-lighter);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .radio-label input[type="radio"]:checked + span {
+            color: var(--primary-light);
+            font-weight: 700;
+        }
+
+        .radio-label:has(input[type="radio"]:checked) {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(245, 158, 11, 0.1));
+            box-shadow: var(--shadow-md), 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        input[type="radio"] {
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Search and Filter UI */
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            background: var(--surface-light);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface-lighter);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), var(--shadow-md);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .filter-chip:hover {
+            background: var(--surface-lighter);
+            transform: translateY(-1px);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* FIX #5: Added classes for responsive design */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .trade-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Responsive Design - Mobile First */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .app-header {
+                padding: 1rem;
+            }
+
+            .app-title {
+                font-size: 1.8rem;
+            }
+
+            .nav-bar {
+                padding: 0.75rem;
+            }
+
+            .nav-toggle {
+                padding: 0.35rem 0.65rem;
+                font-size: 0.75rem;
+                border-radius: 6px;
+                letter-spacing: 0.3px;
+            }
+
+            .nav-toggle-icon {
+                font-size: 0.6rem;
+            }
+
+            .nav-toggle-text {
+                font-size: 0.75rem;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .nav-btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+                width: 100%;
+            }
+
+            .card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+            }
+
+            .league-list {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            /* Make dashboard sections more compact */
+            .card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Reduce spacing in dashboard content */
+            #dashboardContent > div {
+                margin-top: 1rem !important;
+            }
+
+            #dashboardContent h3 {
+                font-size: 1rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            #dashboardContent .player-card {
+                padding: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Compact auction/draft UI */
+            #auctionPlayerName {
+                font-size: 1.5rem !important;
+            }
+
+            #auctionPlayerDetails {
+                font-size: 0.95rem !important;
+            }
+
+            #auctionTimer {
+                font-size: 2.5rem !important;
+            }
+
+            #auctionStatus {
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            #auctionStatus h3 {
+                font-size: 1.3rem !important;
+            }
+
+            #currentPlayerAuction .card {
+                padding: 1rem !important;
+            }
+
+            #leadingBidInfo, #leadingBidder {
+                font-size: 1.1rem !important;
+            }
+
+            .form-group {
+                margin-bottom: 1rem !important;
+            }
+
+            .form-label {
+                font-size: 0.75rem !important;
+                margin-bottom: 0.4rem !important;
+            }
+
+            #bidBuilder {
+                font-size: 0.9rem;
+            }
+
+            #bidBuilder .card {
+                margin-top: 1rem !important;
+            }
+
+            #contractBreakdownTable {
+                font-size: 0.7rem !important;
+            }
+
+            #contractBreakdownTable th,
+            #contractBreakdownTable td {
+                padding: 0.4rem !important;
+            }
+
+            /* Nomination buttons */
+            #nominationPlayerList button {
+                padding: 0.75rem !important;
+                font-size: 0.85rem !important;
+            }
+
+            /* Draft progress section */
+            #draftProgress > div {
+                padding: 0.5rem !important;
+                margin-bottom: 0.4rem !important;
+                font-size: 0.85rem !important;
+            }
+
+            .auction-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.95rem;
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .radio-label {
+                width: 100%;
+            }
+
+            /* FIX #5: Better mobile player cards */
+            .player-card {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+
+            .player-card > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .player-card .btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .player-name {
+                font-size: 1rem;
+            }
+
+            /* FIX #5: Settings grid stacks on mobile */
+            .settings-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* FIX #5: Trade grid stacks on mobile */
+            .trade-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1rem !important;
+            }
+
+            .player-list {
+                gap: 0.5rem;
+            }
+
+            #nominationPlayerList {
+                grid-template-columns: 1fr !important;
+            }
+
+            .salary-cap-bar {
+                height: 30px;
+            }
+
+            .salary-cap-fill {
+                font-size: 0.85rem;
+                padding-right: 0.5rem;
+            }
+
+            .filter-chips {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 0.5rem;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .filter-chip {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            /* Contract breakdown table */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #contractBreakdownTable table {
+                font-size: 0.75rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            #auctionTimer {
+                font-size: 3rem !important;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .league-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .auction-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 48px;
+                font-size: 1rem;
+            }
+
+            .form-input,
+            .form-select {
+                min-height: 48px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <h1 class="app-title">Fantasy Contract League</h1>
+    </div>
+
+    <div id="navBar" class="nav-bar" style="display: none;">
+        <button class="nav-toggle" onclick="toggleNav()">
+            <span class="nav-toggle-icon" id="navToggleIcon">▼</span>
+            <span class="nav-toggle-text">Menu</span>
+        </button>
+        <div class="nav-content collapsed" id="navContent">
+            <button class="nav-btn" onclick="showScreen('league')">My Leagues</button>
+            <button class="nav-btn" onclick="showScreen('dashboard')">Dashboard</button>
+            <button class="nav-btn" onclick="showScreen('roster')">My Roster</button>
+            <button class="nav-btn" onclick="showScreen('auction')">Auction Draft</button>
+            <button class="nav-btn" onclick="showScreen('trades')">Trades</button>
+            <button class="nav-btn" onclick="showScreen('freeAgency')">Free Agency</button>
+            <button class="nav-btn" onclick="showScreen('rookieDraft')">Rookie Draft</button>
+            <button class="nav-btn" id="commissionerBtn" onclick="showScreen('commissioner')" style="display: none;">Commissioner</button>
+            <button class="nav-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="card">
+                <h2 class="card-title">Login / Sign Up</h2>
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="username" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" placeholder="Enter password">
+                </div>
+                <button class="btn btn-primary" onclick="login()">Login / Sign Up</button>
+            </div>
+        </div>
+
+        <!-- League Selection Screen -->
+        <div id="leagueScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">My Leagues</h2>
+                <div id="leagueList" class="league-list"></div>
+                <button class="btn btn-primary" onclick="showCreateLeague()" style="margin-top: 1rem;">Create New League</button>
+            </div>
+        </div>
+
+        <!-- Create League Screen -->
+        <div id="createLeagueScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">Create New League</h2>
+                
+                <h3 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 1rem;">Basic Settings</h3>
+                <div class="form-group">
+                    <label class="form-label">League Name</label>
+                    <input type="text" class="form-input" id="newLeagueName" placeholder="Enter league name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Number of Teams</label>
+                    <select class="form-select" id="numTeams">
+                        <option value="8">8 Teams</option>
+                        <option value="10" selected>10 Teams</option>
+                        <option value="12">12 Teams</option>
+                        <option value="14">14 Teams</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Salary Cap ($M)</label>
+                    <input type="number" class="form-input" id="salaryCap" value="200" placeholder="Enter salary cap">
+                </div>
+
+                <h3 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 1rem;">Roster Settings</h3>
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label class="form-label">Starting QBs</label>
+                        <input type="number" class="form-input" id="startingQB" value="1" min="0" max="4">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Starting RBs</label>
+                        <input type="number" class="form-input" id="startingRB" value="2" min="0" max="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Starting WRs</label>
+                        <input type="number" class="form-input" id="startingWR" value="2" min="0" max="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Starting TEs</label>
+                        <input type="number" class="form-input" id="startingTE" value="1" min="0" max="4">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Starting FLEX (RB/WR/TE)</label>
+                        <input type="number" class="form-input" id="startingFLEX" value="1" min="0" max="4">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bench Spots</label>
+                        <input type="number" class="form-input" id="benchSize" value="6" min="0" max="15">
+                    </div>
+                </div>
+
+                <h3 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 1rem;">Auction Settings</h3>
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label class="form-label">Default Auction Time (seconds)</label>
+                        <input type="number" class="form-input" id="auctionTime" value="60" min="30" max="180">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bid Extension Time (seconds)</label>
+                        <input type="number" class="form-input" id="bidExtension" value="30" min="10" max="60">
+                    </div>
+                </div>
+
+                <h3 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 1rem;">Contract Limits</h3>
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label class="form-label">Max 4-Year Contracts</label>
+                        <select class="form-select" id="max4YearContracts">
+                            <option value="unlimited" selected>Unlimited</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max 3-Year Contracts</label>
+                        <select class="form-select" id="max3YearContracts">
+                            <option value="unlimited" selected>Unlimited</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max 2-Year Contracts</label>
+                        <select class="form-select" id="max2YearContracts">
+                            <option value="unlimited" selected>Unlimited</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max 1-Year Contracts</label>
+                        <select class="form-select" id="max1YearContracts">
+                            <option value="unlimited" selected>Unlimited</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 1rem;">Scoring Settings</h3>
+                <div class="form-group">
+                    <label class="form-label">PPR Format</label>
+                    <select class="form-select" id="pprFormat">
+                        <option value="0">Standard (No PPR)</option>
+                        <option value="0.5">Half PPR (0.5 points)</option>
+                        <option value="1" selected>Full PPR (1 point)</option>
+                    </select>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label class="form-label">Passing TD</label>
+                        <input type="number" class="form-input" id="passingTD" value="4" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Passing Yards (per yard)</label>
+                        <input type="number" class="form-input" id="passingYards" value="0.04" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Rushing TD</label>
+                        <input type="number" class="form-input" id="rushingTD" value="6" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Rushing Yards (per yard)</label>
+                        <input type="number" class="form-input" id="rushingYards" value="0.1" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Receiving TD</label>
+                        <input type="number" class="form-input" id="receivingTD" value="6" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Receiving Yards (per yard)</label>
+                        <input type="number" class="form-input" id="receivingYards" value="0.1" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Interceptions</label>
+                        <input type="number" class="form-input" id="interceptions" value="-2" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fumbles Lost</label>
+                        <input type="number" class="form-input" id="fumblesLost" value="-2" step="0.5">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="createLeague()" style="margin-top: 1.5rem;">Create League</button>
+                <button class="btn btn-secondary" onclick="showScreen('league')" style="margin-left: 1rem;">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">Team Dashboard</h2>
+                <div id="dashboardContent"></div>
+            </div>
+        </div>
+
+        <!-- Roster Screen -->
+        <div id="rosterScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">My Roster</h2>
+                <div id="rosterSalaryCap" class="salary-cap-bar"></div>
+                <div id="rosterContent" class="player-list"></div>
+            </div>
+        </div>
+
+        <!-- Auction Draft Screen -->
+        <div id="auctionScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">Live Auction Draft</h2>
+                
+                <div id="auctionStatus" style="background: var(--surface-light); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <div style="text-align: center; color: var(--text-dim);">
+                        Auction not started. Click "Start Auction" to begin.
+                    </div>
+                </div>
+
+                <div id="scheduledDraftInfo" style="display: none; background: var(--primary-dark); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 2px solid var(--accent);">
+                    <div style="text-align: center;">
+                        <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Draft Scheduled</h4>
+                        <div id="scheduledDraftTime" style="font-size: 1.2rem; font-weight: 700;"></div>
+                        <div id="draftCountdown" style="margin-top: 0.5rem; color: var(--text-dim);"></div>
+                    </div>
+                </div>
+
+                <div id="pauseNotice" style="display: none; background: var(--warning); color: var(--bg); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-weight: 700;">
+                    ⏸️ AUCTION PAUSED BY COMMISSIONER
+                </div>
+
+                <div id="currentPlayerAuction" style="display: none;">
+                    <div class="card" style="background: linear-gradient(135deg, var(--primary-dark), var(--primary)); border: 3px solid var(--accent); padding: 2rem;">
+                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;">
+                            <div>
+                                <h3 style="font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem;" id="auctionPlayerName"></h3>
+                                <div style="font-size: 1.2rem; color: var(--text-dim);" id="auctionPlayerDetails"></div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 4rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; color: var(--accent);" id="auctionTimer">60</div>
+                                <div style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;">Seconds</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border);">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div>
+                                    <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.5rem;">LEADING BID</div>
+                                    <div id="leadingBidInfo" style="font-size: 1.5rem; font-weight: 700;">No bids yet</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.5rem;">LEADING BIDDER</div>
+                                    <div id="leadingBidder" style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: var(--surface-light); margin-top: 1.5rem;">
+                        <h3 style="color: var(--text-dim); margin-bottom: 1rem;">Place Your Bid</h3>
+                        <div id="bidBuilder"></div>
+                    </div>
+                </div>
+
+                <div id="nominationSection" style="display: none;">
+                    <div class="card" style="background: var(--surface-light);">
+                        <h3 style="color: var(--accent); margin-bottom: 1rem;">Your Turn to Nominate</h3>
+                        
+                        <div class="search-box">
+                            <input type="text" id="playerSearch" placeholder="Search players by name or team..." oninput="filterNominationPlayers()">
+                        </div>
+
+                        <div class="filter-chips">
+                            <div class="filter-chip active" onclick="filterByPosition('ALL')">All</div>
+                            <div class="filter-chip" onclick="filterByPosition('QB')">QB</div>
+                            <div class="filter-chip" onclick="filterByPosition('RB')">RB</div>
+                            <div class="filter-chip" onclick="filterByPosition('WR')">WR</div>
+                            <div class="filter-chip" onclick="filterByPosition('TE')">TE</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;" id="nominationPlayerList"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button class="btn btn-primary" id="startAuctionBtn" onclick="startAuction()">Start Auction</button>
+                    <button class="btn btn-warning" id="pauseAuctionBtn" onclick="togglePause()" style="display: none; background: var(--warning); color: var(--bg);">⏸️ Pause</button>
+                    <button class="btn btn-primary" id="resumeAuctionBtn" onclick="togglePause()" style="display: none;">▶️ Resume</button>
+                    <button class="btn btn-danger" id="endAuctionBtn" onclick="endAuction()" style="display: none;">End Auction</button>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <h3 style="color: var(--text-dim); margin-bottom: 1rem;">Draft Progress</h3>
+                    <div id="draftProgress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Free Agency Screen -->
+        <div id="freeAgencyScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">Free Agency Auction</h2>
+                <p style="color: var(--text-dim); margin-bottom: 1rem;">
+                    Sign free agents using the auction system with custom contracts
+                </p>
+
+                <div class="search-box">
+                    <input type="text" id="freeAgentSearch" placeholder="Search free agents by name or team..." oninput="filterFreeAgents()">
+                </div>
+
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterFreeAgentsByPosition('ALL')">All</div>
+                    <div class="filter-chip" onclick="filterFreeAgentsByPosition('QB')">QB</div>
+                    <div class="filter-chip" onclick="filterFreeAgentsByPosition('RB')">RB</div>
+                    <div class="filter-chip" onclick="filterFreeAgentsByPosition('WR')">WR</div>
+                    <div class="filter-chip" onclick="filterFreeAgentsByPosition('TE')">TE</div>
+                </div>
+
+                <div id="freeAgentList" class="player-list"></div>
+            </div>
+        </div>
+
+        <!-- Rookie Draft Screen -->
+        <div id="rookieDraftScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">Rookie Draft</h2>
+                <p style="color: var(--text-dim); margin-bottom: 1rem;">
+                    Rookies are signed to fixed contracts based on draft position
+                </p>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="draftPick">-</div>
+                        <div class="stat-label">Your Pick</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentPick">-</div>
+                        <div class="stat-label">Current Pick</div>
+                    </div>
+                </div>
+                <div id="rookieList" class="player-list" style="margin-top: 2rem;"></div>
+            </div>
+        </div>
+
+        <!-- Trades Screen -->
+        <div id="tradesScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">Trade Center</h2>
+                
+                <div class="trade-grid">
+                    <div>
+                        <h3 style="color: var(--text-dim); margin-bottom: 1rem;">Propose New Trade</h3>
+                        <div class="form-group">
+                            <label class="form-label">Trade Partner</label>
+                            <select class="form-select" id="tradePartner">
+                                <option value="">Select team...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Players</label>
+                            <div id="yourTradePlayers"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Their Players</label>
+                            <div id="theirTradePlayers"></div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="proposeTrade()">Propose Trade</button>
+                    </div>
+                    
+                    <div>
+                        <h3 style="color: var(--text-dim); margin-bottom: 1rem;">Active Trade Offers</h3>
+                        <div id="tradeOffers"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commissioner Screen -->
+        <div id="commissionerScreen" class="screen">
+            <div class="card">
+                <h2 class="card-title">Commissioner Dashboard</h2>
+                
+                <div class="card" style="background: var(--surface-light);">
+                    <h3 class="card-title" style="font-size: 1.3rem;">League Settings</h3>
+                    
+                    <h4 style="color: var(--text-dim); margin-top: 1rem; margin-bottom: 0.5rem;">Roster Settings</h4>
+                    <div class="settings-grid">
+                        <div class="form-group">
+                            <label class="form-label">Starting QBs</label>
+                            <input type="number" class="form-input" id="commStartingQB" min="0" max="4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Starting RBs</label>
+                            <input type="number" class="form-input" id="commStartingRB" min="0" max="6">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Starting WRs</label>
+                            <input type="number" class="form-input" id="commStartingWR" min="0" max="6">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Starting TEs</label>
+                            <input type="number" class="form-input" id="commStartingTE" min="0" max="4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Starting FLEX</label>
+                            <input type="number" class="form-input" id="commStartingFLEX" min="0" max="4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bench Spots</label>
+                            <input type="number" class="form-input" id="commBenchSize" min="0" max="15">
+                        </div>
+                    </div>
+
+                    <h4 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 0.5rem;">Contract Limits</h4>
+                    <div class="settings-grid">
+                        <div class="form-group">
+                            <label class="form-label">Max 4-Year Contracts</label>
+                            <select class="form-select" id="commMax4Year">
+                                <option value="unlimited">Unlimited</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max 3-Year Contracts</label>
+                            <select class="form-select" id="commMax3Year">
+                                <option value="unlimited">Unlimited</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max 2-Year Contracts</label>
+                            <select class="form-select" id="commMax2Year">
+                                <option value="unlimited">Unlimited</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max 1-Year Contracts</label>
+                            <select class="form-select" id="commMax1Year">
+                                <option value="unlimited">Unlimited</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h4 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 0.5rem;">Scoring Settings</h4>
+                    <div class="form-group">
+                        <label class="form-label">PPR Format</label>
+                        <select class="form-select" id="commPprFormat">
+                            <option value="0">Standard (No PPR)</option>
+                            <option value="0.5">Half PPR (0.5 points)</option>
+                            <option value="1">Full PPR (1 point)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-grid">
+                        <div class="form-group">
+                            <label class="form-label">Passing TD</label>
+                            <input type="number" class="form-input" id="commPassingTD" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Passing Yards</label>
+                            <input type="number" class="form-input" id="commPassingYards" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Rushing TD</label>
+                            <input type="number" class="form-input" id="commRushingTD" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Rushing Yards</label>
+                            <input type="number" class="form-input" id="commRushingYards" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Receiving TD</label>
+                            <input type="number" class="form-input" id="commReceivingTD" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Receiving Yards</label>
+                            <input type="number" class="form-input" id="commReceivingYards" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Interceptions</label>
+                            <input type="number" class="form-input" id="commInterceptions" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fumbles Lost</label>
+                            <input type="number" class="form-input" id="commFumblesLost" step="0.5">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="updateLeagueSettings()">Save Settings</button>
+                </div>
+
+                <div class="card" style="background: var(--surface-light); margin-top: 1.5rem;">
+                    <h3 class="card-title" style="font-size: 1.3rem;">Invite Teams</h3>
+                    <div class="form-group">
+                        <label class="form-label">Team Name</label>
+                        <input type="text" class="form-input" id="inviteTeamName" placeholder="Enter team name">
+                    </div>
+                    <button class="btn btn-primary" onclick="inviteTeam()">Send Invite</button>
+                    
+                    <h4 style="color: var(--text-dim); margin-top: 1.5rem; margin-bottom: 0.5rem;">Current Teams</h4>
+                    <div id="leagueTeamsList"></div>
+                </div>
+
+                <div class="card" style="background: var(--surface-light); margin-top: 1.5rem;">
+                    <h3 class="card-title" style="font-size: 1.3rem;">Draft Management</h3>
+                    <div class="form-group">
+                        <label class="form-label">Auction Draft Date & Time</label>
+                        <input type="datetime-local" class="form-input" id="draftDateTime">
+                    </div>
+                    <button class="btn btn-primary" onclick="scheduleDraft()">Schedule Draft</button>
+                    <button class="btn btn-secondary" onclick="clearScheduledDraft()" style="margin-left: 0.5rem;">Clear Schedule</button>
+                    
+                    <div id="currentSchedule" style="margin-top: 1rem; padding: 1rem; background: var(--surface); border-radius: 6px; display: none;">
+                        <div style="color: var(--text-dim); font-size: 0.85rem;">Currently Scheduled:</div>
+                        <div style="font-weight: 700; margin-top: 0.25rem;" id="currentScheduleTime"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global error handler
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Global error:', message, 'at line', lineno);
+            return true;
+        };
+
+        // ============================================
+        // SLEEPER API INTEGRATION
+        // ============================================
+
+        let sleeperPlayers = null;
+        let sleeperNflState = null;
+        let currentPositionFilter = 'ALL';
+        let currentSearchTerm = '';
+        let freeAgentPositionFilter = 'ALL';
+        let freeAgentSearchTerm = '';
+
+        // Load NFL players from Sleeper API
+        async function loadSleeperPlayers() {
+            try {
+                console.log('Loading Sleeper players...');
+                
+                // Check cache first (24 hour expiry)
+                const cached = localStorage.getItem('sleeper_players');
+                const cacheTime = localStorage.getItem('sleeper_players_time');
+                
+                if (cached && cacheTime) {
+                    const hoursSinceCache = (Date.now() - parseInt(cacheTime)) / (1000 * 60 * 60);
+                    if (hoursSinceCache < 24) {
+                        console.log('Using cached player data');
+                        sleeperPlayers = JSON.parse(cached);
+                        return sleeperPlayers;
+                    }
+                }
+
+                // Try direct fetch first
+                let response;
+                try {
+                    response = await fetch('https://api.sleeper.app/v1/players/nfl');
+                    if (!response.ok) throw new Error('Direct fetch failed');
+                } catch (directError) {
+                    console.log('Direct fetch failed, trying CORS proxy...');
+                    // Fallback to CORS proxy
+                    response = await fetch('https://corsproxy.io/?https://api.sleeper.app/v1/players/nfl');
+                }
+                
+                if (!response.ok) throw new Error('Failed to fetch players');
+                
+                const data = await response.json();
+                sleeperPlayers = data;
+                
+                // Cache the data
+                localStorage.setItem('sleeper_players', JSON.stringify(data));
+                localStorage.setItem('sleeper_players_time', Date.now().toString());
+                
+                console.log('Loaded ' + Object.keys(sleeperPlayers).length + ' players from Sleeper');
+                return sleeperPlayers;
+            } catch (error) {
+                console.error('Error loading Sleeper players:', error);
+                
+                // If all else fails, check if we have ANY cached data (even expired)
+                const cached = localStorage.getItem('sleeper_players');
+                if (cached) {
+                    console.log('Using expired cache as fallback');
+                    sleeperPlayers = JSON.parse(cached);
+                    return sleeperPlayers;
+                }
+                
+                alert('Failed to load NFL players. Please open this file using a web server (not file://). See console for details.');
+                return null;
+            }
+        }
+
+        // Get NFL state (current season, week, etc)
+        async function loadSleeperNflState() {
+            try {
+                let response;
+                try {
+                    response = await fetch('https://api.sleeper.app/v1/state/nfl');
+                    if (!response.ok) throw new Error('Direct fetch failed');
+                } catch (directError) {
+                    console.log('Direct fetch failed for NFL state, trying CORS proxy...');
+                    response = await fetch('https://corsproxy.io/?https://api.sleeper.app/v1/state/nfl');
+                }
+                
+                if (!response.ok) throw new Error('Failed to fetch NFL state');
+                
+                sleeperNflState = await response.json();
+                console.log('Current NFL state:', sleeperNflState);
+                return sleeperNflState;
+            } catch (error) {
+                console.error('Error loading NFL state:', error);
+                return null;
+            }
+        }
+
+        // Convert Sleeper player to our format
+        function convertSleeperPlayer(playerId, playerData) {
+            if (!playerData || !playerData.position || playerData.position === 'DEF') {
+                return null;
+            }
+
+            // Only include offensive players
+            const validPositions = ['QB', 'RB', 'WR', 'TE'];
+            if (!validPositions.includes(playerData.position)) {
+                return null;
+            }
+
+            // Filter out inactive players
+            if (playerData.status === 'Inactive' || playerData.status === 'Retired') {
+                return null;
+            }
+
+            return {
+                id: playerId,
+                name: playerData.full_name || `${playerData.first_name} ${playerData.last_name}`,
+                firstName: playerData.first_name,
+                lastName: playerData.last_name,
+                position: playerData.position,
+                team: playerData.team || 'FA',
+                age: playerData.age,
+                college: playerData.college,
+                yearsExp: playerData.years_exp,
+                number: playerData.number,
+                status: playerData.status,
+                injuryStatus: playerData.injury_status
+            };
+        }
+
+        // Get available players (not on any roster)
+        function getAvailablePlayers() {
+            if (!sleeperPlayers || !currentLeague) return [];
+
+            const draftedPlayerIds = new Set();
+            currentLeague.teams.forEach(team => {
+                team.roster.forEach(player => {
+                    draftedPlayerIds.add(player.id);
+                });
+            });
+
+            const availablePlayers = [];
+            for (const [playerId, playerData] of Object.entries(sleeperPlayers)) {
+                if (!draftedPlayerIds.has(playerId)) {
+                    const converted = convertSleeperPlayer(playerId, playerData);
+                    if (converted) {
+                        availablePlayers.push(converted);
+                    }
+                }
+            }
+
+            // Sort by position, then name
+            return availablePlayers.sort((a, b) => {
+                if (a.position !== b.position) {
+                    const posOrder = { 'QB': 1, 'RB': 2, 'WR': 3, 'TE': 4 };
+                    return (posOrder[a.position] || 99) - (posOrder[b.position] || 99);
+                }
+                return a.name.localeCompare(b.name);
+            });
+        }
+
+        // Search and filter players
+        function filterPlayers(players, searchTerm, positionFilter) {
+            let filtered = players;
+
+            // Filter by position
+            if (positionFilter !== 'ALL') {
+                filtered = filtered.filter(p => p.position === positionFilter);
+            }
+
+            // Filter by search term
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(term) ||
+                    (p.team && p.team.toLowerCase().includes(term))
+                );
+            }
+
+            return filtered;
+        }
+
+        // ============================================
+        // App State
+        let currentUser = null;
+        let currentLeague = null;
+        let currentTeam = null;
+        let navCollapsed = true; // Track nav state
+
+        // FIX #6: Centralized timer management
+        let activeTimers = {
+            auction: null,
+            draftSchedule: null,
+            countdown: null
+        };
+
+        // Toggle navigation menu
+        function toggleNav() {
+            navCollapsed = !navCollapsed;
+            const navContent = document.getElementById('navContent');
+            const navIcon = document.getElementById('navToggleIcon');
+            
+            if (navCollapsed) {
+                navContent.classList.add('collapsed');
+                navIcon.textContent = '▼';
+                navIcon.style.transform = 'rotate(0deg)';
+            } else {
+                navContent.classList.remove('collapsed');
+                navIcon.textContent = '▲';
+                navIcon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // FIX #6: Clean up all timers
+        function cleanupAllTimers() {
+            console.log('Cleaning up all timers');
+            if (activeTimers.auction) {
+                clearInterval(activeTimers.auction);
+                activeTimers.auction = null;
+            }
+            if (activeTimers.draftSchedule) {
+                clearInterval(activeTimers.draftSchedule);
+                activeTimers.draftSchedule = null;
+            }
+            if (activeTimers.countdown) {
+                clearInterval(activeTimers.countdown);
+                activeTimers.countdown = null;
+            }
+        }
+
+        // FIX #2: Improved timer with Page Visibility API support
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                console.log('Page visible - refreshing auction display');
+                if (currentLeague?.auctionState?.status === 'active') {
+                    updateAuctionDisplay();
+                }
+            }
+        });
+
+        // Load/Save data
+        function loadData() {
+            const users = localStorage.getItem('fcl_users');
+            return users ? JSON.parse(users) : {};
+        }
+
+        function saveData(data) {
+            localStorage.setItem('fcl_users', JSON.stringify(data));
+        }
+
+        // FIX #7: Migrate league format only once
+        function migrateLeagueFormat(league) {
+            if (league._migrated) {
+                return league;
+            }
+
+            console.log('Migrating league format for:', league.id);
+            
+            if (!league.teams || !Array.isArray(league.teams)) {
+                league.teams = [{
+                    owner: currentUser,
+                    teamName: league.teamName || (currentUser + "'s Team"),
+                    roster: league.roster || [],
+                    usedCap: league.usedCap || 0
+                }];
+                league.commissioner = currentUser;
+            }
+            
+            if (!league.rosterSettings) {
+                league.rosterSettings = {
+                    startingQB: 1, startingRB: 2, startingWR: 2,
+                    startingTE: 1, startingFLEX: 1, benchSize: 6
+                };
+            }
+            
+            if (!league.contractLimits) {
+                league.contractLimits = {
+                    max4Year: 'unlimited', max3Year: 'unlimited',
+                    max2Year: 'unlimited', max1Year: 'unlimited'
+                };
+            }
+            
+            if (!league.scoringSettings) {
+                league.scoringSettings = {
+                    ppr: 1, passingTD: 4, passingYards: 0.04,
+                    rushingTD: 6, rushingYards: 0.1, receivingTD: 6,
+                    receivingYards: 0.1, interceptions: -2, fumblesLost: -2
+                };
+            }
+            
+            if (!league.auctionSettings) {
+                league.auctionSettings = {
+                    defaultTime: 60, bidExtension: 30, maxTime: 60
+                };
+            }
+            
+            if (!league.trades) league.trades = [];
+            
+            league._migrated = true;
+            console.log('League migration complete');
+            return league;
+        }
+
+        // Login/Signup
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+
+            const data = loadData();
+            
+            if (!data[username]) {
+                data[username] = { password: password, leagues: [] };
+                saveData(data);
+            } else if (data[username].password !== password) {
+                alert('Incorrect password');
+                return;
+            }
+
+            currentUser = username;
+            showScreen('league');
+            renderLeagues();
+        }
+
+        function logout() {
+            cleanupAllTimers(); // FIX #6
+            currentUser = null;
+            currentLeague = null;
+            currentTeam = null;
+            document.getElementById('navBar').style.display = 'none';
+            showScreen('login');
+        }
+
+        // League Management
+        function renderLeagues() {
+            const data = loadData();
+            const userLeagues = data[currentUser].leagues;
+            const listEl = document.getElementById('leagueList');
+
+            if (userLeagues.length === 0) {
+                listEl.innerHTML = '<p style="text-align: center; color: var(--text-dim); padding: 2rem;">No leagues yet. Create one to get started!</p>';
+                return;
+            }
+
+            listEl.innerHTML = userLeagues.map(league => {
+                let teamName, teamCount;
+                
+                if (league.teams && Array.isArray(league.teams)) {
+                    const userTeam = league.teams.find(t => t.owner === currentUser);
+                    if (!userTeam) return '';
+                    teamName = userTeam.teamName;
+                    teamCount = league.teams.length;
+                } else {
+                    teamName = league.teamName || (currentUser + "'s Team");
+                    teamCount = 1;
+                }
+                
+                return `
+                    <div class="league-card" onclick="selectLeague('${league.id}')">
+                        <div class="league-name">${league.name}</div>
+                        <div class="league-info">${teamCount}/${league.numTeams} Teams • $${league.salaryCap}M Cap</div>
+                        <div class="league-info" style="margin-top: 0.5rem;">Your Team: ${teamName}</div>
+                        ${league.commissioner === currentUser ? '<div class="badge badge-guaranteed" style="margin-top: 0.5rem;">Commissioner</div>' : ''}
+                    </div>
+                `;
+            }).filter(Boolean).join('');
+        }
+
+        function showCreateLeague() {
+            showScreen('createLeague');
+        }
+
+        function createLeague() {
+            const name = document.getElementById('newLeagueName').value.trim();
+            const numTeams = parseInt(document.getElementById('numTeams').value);
+            const salaryCap = parseFloat(document.getElementById('salaryCap').value);
+
+            const rosterSettings = {
+                startingQB: parseInt(document.getElementById('startingQB').value),
+                startingRB: parseInt(document.getElementById('startingRB').value),
+                startingWR: parseInt(document.getElementById('startingWR').value),
+                startingTE: parseInt(document.getElementById('startingTE').value),
+                startingFLEX: parseInt(document.getElementById('startingFLEX').value),
+                benchSize: parseInt(document.getElementById('benchSize').value)
+            };
+
+            const contractLimits = {
+                max4Year: document.getElementById('max4YearContracts').value,
+                max3Year: document.getElementById('max3YearContracts').value,
+                max2Year: document.getElementById('max2YearContracts').value,
+                max1Year: document.getElementById('max1YearContracts').value
+            };
+
+            const auctionSettings = {
+                defaultTime: parseInt(document.getElementById('auctionTime').value),
+                bidExtension: parseInt(document.getElementById('bidExtension').value),
+                maxTime: parseInt(document.getElementById('auctionTime').value)
+            };
+
+            const scoringSettings = {
+                ppr: parseFloat(document.getElementById('pprFormat').value),
+                passingTD: parseFloat(document.getElementById('passingTD').value),
+                passingYards: parseFloat(document.getElementById('passingYards').value),
+                rushingTD: parseFloat(document.getElementById('rushingTD').value),
+                rushingYards: parseFloat(document.getElementById('rushingYards').value),
+                receivingTD: parseFloat(document.getElementById('receivingTD').value),
+                receivingYards: parseFloat(document.getElementById('receivingYards').value),
+                interceptions: parseFloat(document.getElementById('interceptions').value),
+                fumblesLost: parseFloat(document.getElementById('fumblesLost').value)
+            };
+
+            if (!name) {
+                alert('Please enter a league name');
+                return;
+            }
+
+            const data = loadData();
+            const leagueId = 'league_' + Date.now();
+            const teamName = currentUser + "'s Team";
+
+            const newLeague = {
+                id: leagueId,
+                name: name,
+                numTeams: numTeams,
+                salaryCap: salaryCap,
+                commissioner: currentUser,
+                teams: [{
+                    owner: currentUser,
+                    teamName: teamName,
+                    roster: [],
+                    usedCap: 0
+                }],
+                rosterSettings: rosterSettings,
+                contractLimits: contractLimits,
+                auctionSettings: auctionSettings,
+                scoringSettings: scoringSettings,
+                trades: [],
+                draftScheduled: null,
+                auctionState: null,
+                _migrated: true // FIX #7
+            };
+
+            if (!data[currentUser]) {
+                data[currentUser] = { password: 'temp', leagues: [] };
+            }
+
+            data[currentUser].leagues.push(newLeague);
+            saveData(data);
+
+            showScreen('league');
+            renderLeagues();
+        }
+
+        function selectLeague(leagueId) {
+            cleanupAllTimers(); // FIX #6
+            
+            const data = loadData();
+            currentLeague = data[currentUser].leagues.find(l => l.id === leagueId);
+            
+            currentLeague = migrateLeagueFormat(currentLeague); // FIX #7
+            currentTeam = currentLeague.teams.find(t => t.owner === currentUser);
+            
+            saveLeague();
+            
+            document.getElementById('navBar').style.display = 'flex';
+            
+            if (currentLeague.commissioner === currentUser) {
+                document.getElementById('commissionerBtn').style.display = 'block';
+            } else {
+                document.getElementById('commissionerBtn').style.display = 'none';
+            }
+            
+            showScreen('dashboard');
+            renderDashboard();
+        }
+
+        // Contract Calculations
+        function calculateContractValue(totalAmount, years, structure, guaranteedPercent) {
+            const yearWeights = [1.0, 0.9, 0.8, 0.7];
+            const guaranteedMultiplier = guaranteedPercent / 100;
+            const nonGuaranteedMultiplier = (100 - guaranteedPercent) / 100 * 0.7;
+            
+            let yearlyAmounts = [];
+            let baseAmount = totalAmount / years;
+
+            for (let i = 0; i < years; i++) {
+                let yearAmount = baseAmount;
+                
+                if (structure === 'increasing') {
+                    yearAmount = baseAmount * (1 + (i * 0.1));
+                } else if (structure === 'decreasing') {
+                    yearAmount = baseAmount * (1 - (i * 0.1));
+                }
+
+                const guaranteedValue = yearAmount * guaranteedMultiplier;
+                const nonGuaranteedValue = yearAmount * nonGuaranteedMultiplier;
+                const totalYearValue = guaranteedValue + nonGuaranteedValue;
+                const weightedValue = totalYearValue * yearWeights[i];
+
+                yearlyAmounts.push({
+                    year: i + 1,
+                    amount: yearAmount,
+                    guaranteedAmount: yearAmount * guaranteedMultiplier,
+                    nonGuaranteedAmount: yearAmount * nonGuaranteedMultiplier,
+                    weightedValue: weightedValue
+                });
+            }
+
+            if (structure === 'increasing' || structure === 'decreasing') {
+                const totalActual = yearlyAmounts.reduce((sum, y) => sum + y.amount, 0);
+                const ratio = totalAmount / totalActual;
+                yearlyAmounts = yearlyAmounts.map(y => ({
+                    ...y,
+                    amount: y.amount * ratio,
+                    guaranteedAmount: y.guaranteedAmount * ratio,
+                    nonGuaranteedAmount: y.nonGuaranteedAmount * ratio,
+                    weightedValue: y.weightedValue * ratio
+                }));
+            }
+
+            const totalValue = yearlyAmounts.reduce((sum, y) => sum + y.weightedValue, 0);
+
+            return {
+                years: yearlyAmounts,
+                totalWeightedValue: totalValue,
+                capHit: totalAmount
+            };
+        }
+
+        // Screen Management
+        function showScreen(screenName) {
+            // FIX: Don't clean up auction timer when navigating away from auction
+            // The auction should continue running in the background
+            if (screenName !== 'auction') {
+                // Only clean up draft schedule and countdown timers
+                if (activeTimers.draftSchedule) {
+                    clearInterval(activeTimers.draftSchedule);
+                    activeTimers.draftSchedule = null;
+                }
+                if (activeTimers.countdown) {
+                    clearInterval(activeTimers.countdown);
+                    activeTimers.countdown = null;
+                }
+            }
+            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenName + 'Screen').classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Collapse nav after selection on mobile
+            if (window.innerWidth <= 768) {
+                navCollapsed = true;
+                document.getElementById('navContent').classList.add('collapsed');
+                document.getElementById('navToggleIcon').textContent = '▼';
+            }
+            
+            if (screenName === 'league') renderLeagues();
+            if (screenName === 'dashboard') renderDashboard();
+            if (screenName === 'roster') renderRoster();
+            if (screenName === 'auction') renderAuction();
+            if (screenName === 'freeAgency') renderFreeAgency();
+            if (screenName === 'rookieDraft') renderRookieDraft();
+            if (screenName === 'trades') renderTrades();
+            if (screenName === 'commissioner') renderCommissioner();
+        }
+
+        // Dashboard
+        function renderDashboard() {
+            const el = document.getElementById('dashboardContent');
+            const rosterSettings = currentLeague.rosterSettings;
+            const maxRoster = rosterSettings.startingQB + rosterSettings.startingRB + 
+                             rosterSettings.startingWR + rosterSettings.startingTE + 
+                             rosterSettings.startingFLEX + rosterSettings.benchSize;
+            
+            const availablePlayers = getAvailablePlayers();
+            const isMobile = window.innerWidth <= 768;
+            const recentContractsCount = isMobile ? 3 : 5;
+            
+            el.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">$${currentTeam.usedCap.toFixed(1)}M</div>
+                        <div class="stat-label">Used Cap</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$${(currentLeague.salaryCap - currentTeam.usedCap).toFixed(1)}M</div>
+                        <div class="stat-label">Available Cap</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${currentTeam.roster.length}/${maxRoster}</div>
+                        <div class="stat-label">Roster Size</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${currentLeague.availablePlayers.length}</div>
+                        <div class="stat-label">Free Agents</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: ${isMobile ? '1rem' : '2rem'};">
+                    <h3 style="color: var(--text-dim); margin-bottom: ${isMobile ? '0.75rem' : '1rem'};">League Settings</h3>
+                    <div style="background: var(--surface-light); padding: ${isMobile ? '1rem' : '1.5rem'}; border-radius: 8px; border: 2px solid var(--border);">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(${isMobile ? '140px' : '200px'}, 1fr)); gap: ${isMobile ? '0.75rem' : '1rem'};">
+                            <div>
+                                <div style="color: var(--text-dim); font-size: 0.85rem;">Scoring</div>
+                                <div style="font-weight: 700; ${isMobile ? 'font-size: 0.9rem;' : ''}">${currentLeague.scoringSettings.ppr === 1 ? 'Full PPR' : currentLeague.scoringSettings.ppr === 0.5 ? 'Half PPR' : 'Standard'}</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-dim); font-size: 0.85rem;">Starters</div>
+                                <div style="font-weight: 700; ${isMobile ? 'font-size: 0.85rem;' : ''}">${rosterSettings.startingQB} QB, ${rosterSettings.startingRB} RB, ${rosterSettings.startingWR} WR, ${rosterSettings.startingTE} TE, ${rosterSettings.startingFLEX} FLEX</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-dim); font-size: 0.85rem;">Bench</div>
+                                <div style="font-weight: 700; ${isMobile ? 'font-size: 0.9rem;' : ''}">${rosterSettings.benchSize} spots</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: ${isMobile ? '1rem' : '2rem'};">
+                    <h3 style="color: var(--text-dim); margin-bottom: ${isMobile ? '0.75rem' : '1rem'};">Recent Contracts</h3>
+                    ${currentTeam.roster.length === 0 
+                        ? `<p style="color: var(--text-dim); text-align: center; padding: ${isMobile ? '1.5rem' : '2rem'}; font-size: ${isMobile ? '0.9rem' : '1rem'};">No players signed yet. Head to the auction to start building your team!</p>`
+                        : currentTeam.roster.slice(-recentContractsCount).reverse().map(p => `
+                            <div class="player-card" style="grid-template-columns: ${isMobile ? '1fr' : '2fr 1fr 1fr'}; padding: ${isMobile ? '0.75rem' : '1rem'};">
+                                <div>
+                                    <span class="player-name" style="font-size: ${isMobile ? '0.95rem' : '1.1rem'};">${p.name}</span>
+                                    <span class="player-position">${p.position}</span>
+                                </div>
+                                <div style="font-size: ${isMobile ? '0.9rem' : '1rem'};">$${p.contract.capHit.toFixed(1)}M / ${p.contract.years.length}yr</div>
+                                <div style="font-size: ${isMobile ? '0.9rem' : '1rem'};">${p.contract.guaranteedPercent}% GTD</div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            `;
+        }
+
+        // Roster
+        function renderRoster() {
+            const capPercent = (currentTeam.usedCap / currentLeague.salaryCap) * 100;
+            const capBar = document.getElementById('rosterSalaryCap');
+            capBar.innerHTML = `
+                <div class="salary-cap-fill ${capPercent > 95 ? 'danger' : ''}" style="width: ${Math.min(capPercent, 100)}%">
+                    $${currentTeam.usedCap.toFixed(1)}M / $${currentLeague.salaryCap}M
+                </div>
+            `;
+
+            const el = document.getElementById('rosterContent');
+            if (currentTeam.roster.length === 0) {
+                el.innerHTML = '<p style="text-align: center; color: var(--text-dim); padding: 2rem;">No players on roster. Visit the auction to sign players!</p>';
+                return;
+            }
+
+            el.innerHTML = currentTeam.roster.map(player => `
+                <div class="player-card">
+                    <div>
+                        <span class="player-name">${player.name}</span>
+                        <span class="player-position">${player.position}</span>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">$${player.contract.capHit.toFixed(1)}M</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">${player.contract.years.length} years</div>
+                    </div>
+                    <div>
+                        <span class="badge ${player.contract.guaranteedPercent === 100 ? 'badge-guaranteed' : 'badge-non-guaranteed'}">
+                            ${player.contract.guaranteedPercent}% GTD
+                        </span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-dim);">${player.contract.structure}</div>
+                    <button class="btn btn-danger" onclick="cutPlayer(${player.id})">Cut</button>
+                </div>
+            `).join('');
+        }
+
+        function cutPlayer(playerId) {
+            const player = currentTeam.roster.find(p => p.id === playerId);
+            if (!confirm(`Cut ${player.name}? Guaranteed money will still count against cap.`)) return;
+
+            const guaranteedHit = player.contract.years.reduce((sum, y) => sum + y.guaranteedAmount, 0);
+            
+            currentTeam.usedCap -= player.contract.capHit;
+            currentTeam.usedCap += guaranteedHit;
+            currentTeam.roster = currentTeam.roster.filter(p => p.id !== playerId);
+            // Player automatically becomes available via getAvailablePlayers()
+
+            saveLeague();
+            renderRoster();
+        }
+
+        // FIX #4: Check contract limits with optional team parameter
+        function canSignContractLength(years, teamToCheck = currentTeam) {
+            if (!currentLeague.contractLimits) return true;
+            
+            const limitKey = `max${years}Year`;
+            const limit = currentLeague.contractLimits[limitKey];
+            
+            if (limit === 'unlimited') return true;
+            
+            const currentCount = teamToCheck.roster.filter(p => 
+                p.contract.years.length === years
+            ).length;
+            
+            return currentCount < parseInt(limit);
+        }
+
+        function getContractLimitText(years) {
+            if (!currentLeague.contractLimits) return '';
+            
+            const limitKey = `max${years}Year`;
+            const limit = currentLeague.contractLimits[limitKey];
+            
+            if (limit === 'unlimited') return '';
+            
+            const usage = currentTeam.roster.filter(p => p.contract.years.length === years).length;
+            
+            return `(${usage}/${limit} used)`;
+        }
+
+        // Auction System
+        function checkScheduledDraft() {
+            if (!currentLeague || !currentLeague.draftScheduled) return;
+            
+            const scheduledTime = new Date(currentLeague.draftScheduled).getTime();
+            const now = Date.now();
+            
+            if (now >= scheduledTime && (!currentLeague.auctionState || currentLeague.auctionState.status !== 'active')) {
+                console.log('Auto-starting scheduled draft');
+                startAuction();
+                if (activeTimers.draftSchedule) {
+                    clearInterval(activeTimers.draftSchedule);
+                    activeTimers.draftSchedule = null;
+                }
+            }
+        }
+
+        function startDraftScheduleChecker() {
+            if (activeTimers.draftSchedule) {
+                clearInterval(activeTimers.draftSchedule);
+            }
+            
+            if (currentLeague && currentLeague.draftScheduled) {
+                activeTimers.draftSchedule = setInterval(checkScheduledDraft, 1000);
+                updateDraftCountdown();
+            }
+        }
+
+        function updateDraftCountdown() {
+            if (!currentLeague || !currentLeague.draftScheduled) {
+                if (activeTimers.countdown) {
+                    clearInterval(activeTimers.countdown);
+                    activeTimers.countdown = null;
+                }
+                return;
+            }
+
+            const scheduledTime = new Date(currentLeague.draftScheduled).getTime();
+            
+            if (activeTimers.countdown) {
+                clearInterval(activeTimers.countdown);
+            }
+            
+            activeTimers.countdown = setInterval(() => {
+                const now = Date.now();
+                const diff = scheduledTime - now;
+                
+                if (diff <= 0) {
+                    clearInterval(activeTimers.countdown);
+                    activeTimers.countdown = null;
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                const countdownEl = document.getElementById('draftCountdown');
+                if (countdownEl) {
+                    if (days > 0) {
+                        countdownEl.textContent = `Starts in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    } else if (hours > 0) {
+                        countdownEl.textContent = `Starts in: ${hours}h ${minutes}m ${seconds}s`;
+                    } else if (minutes > 0) {
+                        countdownEl.textContent = `Starts in: ${minutes}m ${seconds}s`;
+                    } else {
+                        countdownEl.textContent = `Starts in: ${seconds}s`;
+                    }
+                }
+            }, 1000);
+        }
+
+        function renderAuction() {
+            if (!currentLeague.auctionSettings) {
+                currentLeague.auctionSettings = {
+                    defaultTime: 60,
+                    bidExtension: 30,
+                    maxTime: 60
+                };
+            }
+
+            if (currentLeague.draftScheduled && (!currentLeague.auctionState || currentLeague.auctionState.status !== 'active')) {
+                const scheduledDate = new Date(currentLeague.draftScheduled);
+                document.getElementById('scheduledDraftInfo').style.display = 'block';
+                document.getElementById('scheduledDraftTime').textContent = scheduledDate.toLocaleString();
+                startDraftScheduleChecker();
+            } else {
+                document.getElementById('scheduledDraftInfo').style.display = 'none';
+            }
+
+            if (!currentLeague.auctionState || currentLeague.auctionState.status !== 'active') {
+                const availablePlayers = getAvailablePlayers();
+                document.getElementById('auctionStatus').style.display = 'block';
+                document.getElementById('auctionStatus').innerHTML = `
+                    <div style="text-align: center;">
+                        <h3 style="color: var(--text); margin-bottom: 1rem;">Ready to Start Auction</h3>
+                        <p style="color: var(--text-dim);">Teams: ${currentLeague.teams.length}</p>
+                        <p style="color: var(--text-dim);">Available Players: ${availablePlayers.length}</p>
+                    </div>
+                `;
+                document.getElementById('startAuctionBtn').style.display = 'inline-block';
+                document.getElementById('pauseAuctionBtn').style.display = 'none';
+                document.getElementById('resumeAuctionBtn').style.display = 'none';
+                document.getElementById('endAuctionBtn').style.display = 'none';
+                document.getElementById('currentPlayerAuction').style.display = 'none';
+                document.getElementById('nominationSection').style.display = 'none';
+                document.getElementById('pauseNotice').style.display = 'none';
+            } else if (currentLeague.auctionState.status === 'active') {
+                document.getElementById('startAuctionBtn').style.display = 'none';
+                document.getElementById('endAuctionBtn').style.display = 'inline-block';
+                
+                if (currentLeague.commissioner === currentUser) {
+                    if (currentLeague.auctionState.paused) {
+                        document.getElementById('pauseAuctionBtn').style.display = 'none';
+                        document.getElementById('resumeAuctionBtn').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('pauseAuctionBtn').style.display = 'inline-block';
+                        document.getElementById('resumeAuctionBtn').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('pauseAuctionBtn').style.display = 'none';
+                    document.getElementById('resumeAuctionBtn').style.display = 'none';
+                }
+
+                if (currentLeague.auctionState.paused) {
+                    document.getElementById('pauseNotice').style.display = 'block';
+                } else {
+                    document.getElementById('pauseNotice').style.display = 'none';
+                }
+                
+                if (currentLeague.auctionState.currentPlayer) {
+                    renderActiveAuction();
+                } else {
+                    promptNomination();
+                }
+            }
+
+            renderDraftProgress();
+        }
+
+        function startAuction() {
+            currentLeague.auctionState = {
+                status: 'active',
+                currentNominatorIndex: 0,
+                currentPlayer: null,
+                currentBids: [],
+                timeRemaining: currentLeague.auctionSettings.defaultTime,
+                nominationOrder: currentLeague.teams.map(t => t.owner)
+            };
+
+            saveLeague();
+            renderAuction();
+            promptNomination();
+        }
+
+        function promptNomination() {
+            const nominator = currentLeague.auctionState.nominationOrder[currentLeague.auctionState.currentNominatorIndex];
+            
+            document.getElementById('auctionStatus').style.display = 'block';
+            document.getElementById('currentPlayerAuction').style.display = 'none';
+            
+            if (nominator === currentUser) {
+                document.getElementById('auctionStatus').innerHTML = `
+                    <div style="text-align: center;">
+                        <h3 style="color: var(--accent); font-family: 'Barlow Condensed', sans-serif; font-size: 2rem;">YOUR TURN TO NOMINATE A PLAYER</h3>
+                        <p style="color: var(--text-dim); margin-top: 0.5rem;">Select a player below to put them up for auction</p>
+                    </div>
+                `;
+                document.getElementById('nominationSection').style.display = 'block';
+                renderNominationList();
+            } else {
+                const nominatorTeam = getNominatorTeamName(nominator);
+                document.getElementById('auctionStatus').innerHTML = `
+                    <div style="text-align: center;">
+                        <h3 style="color: var(--text-dim);">Waiting for ${nominatorTeam} to nominate a player...</h3>
+                        <p style="color: var(--text-dim); margin-top: 0.5rem; font-size: 0.9rem;">In a real multiplayer environment, this would update automatically</p>
+                    </div>
+                `;
+                document.getElementById('nominationSection').style.display = 'none';
+            }
+        }
+
+        function getNominatorTeamName(owner) {
+            const team = currentLeague.teams.find(t => t.owner === owner);
+            return team ? team.teamName : owner;
+        }
+
+        function renderNominationList() {
+            const el = document.getElementById('nominationPlayerList');
+            const availablePlayers = getAvailablePlayers();
+            
+            // Apply filters
+            const filtered = filterPlayers(availablePlayers, currentSearchTerm, currentPositionFilter);
+            const players = filtered.slice(0, 100); // Limit to 100 for performance
+            
+            if (players.length === 0) {
+                el.innerHTML = '<p style="text-align: center; color: var(--text-dim); padding: 2rem; grid-column: 1/-1;">No players found matching your filters</p>';
+                return;
+            }
+            
+            el.innerHTML = players.map(player => `
+                <button class="btn btn-secondary" onclick="nominatePlayer('${player.id}')" style="text-align: left; padding: 1rem; display: flex; flex-direction: column; align-items: flex-start;">
+                    <div style="font-size: 1.1rem; font-weight: 700;">${player.name}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">${player.position} - ${player.team}</div>
+                    ${player.age ? `<div style="font-size: 0.75rem; opacity: 0.6; margin-top: 0.25rem;">Age ${player.age}${player.yearsExp ? `, ${player.yearsExp} yrs exp` : ''}</div>` : ''}
+                </button>
+            `).join('');
+        }
+
+        function filterByPosition(position) {
+            currentPositionFilter = position;
+            
+            // Update active state
+            document.querySelectorAll('#nominationSection .filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderNominationList();
+        }
+
+        function filterNominationPlayers() {
+            currentSearchTerm = document.getElementById('playerSearch').value;
+            renderNominationList();
+        }
+
+        function nominatePlayer(playerId) {
+            console.log('nominatePlayer called with:', playerId);
+            
+            const availablePlayers = getAvailablePlayers();
+            const player = availablePlayers.find(p => p.id === playerId);
+            
+            if (!player) {
+                console.error('Player not found:', playerId);
+                return;
+            }
+
+            console.log('Nominating player:', player);
+
+            currentLeague.auctionState.currentPlayer = player;
+            currentLeague.auctionState.currentBids = [];
+            currentLeague.auctionState.timeRemaining = currentLeague.auctionSettings.defaultTime;
+            currentLeague.auctionState.auctionStartTime = Date.now();
+
+            console.log('Auction state updated:', currentLeague.auctionState);
+            
+            saveLeague();
+            renderAuction();
+            
+            console.log('About to start auction timer');
+            startAuctionTimer();
+        }
+
+        function renderActiveAuction() {
+            console.log('renderActiveAuction called');
+            document.getElementById('auctionStatus').style.display = 'none';
+            document.getElementById('nominationSection').style.display = 'none';
+            document.getElementById('currentPlayerAuction').style.display = 'block';
+
+            const player = currentLeague.auctionState.currentPlayer;
+            
+            document.getElementById('auctionPlayerName').textContent = player.name;
+            document.getElementById('auctionPlayerDetails').textContent = `${player.position} - ${player.team}${player.age ? ` • Age ${player.age}` : ''}${player.yearsExp ? ` • ${player.yearsExp} yrs exp` : ''}`;
+            
+            updateAuctionDisplay();
+            renderBidBuilder();
+            
+            // Make sure timer is running
+            if (!activeTimers.auction) {
+                console.log('Timer not running, starting it now');
+                startAuctionTimer();
+            }
+        }
+
+        function updateAuctionDisplay() {
+            const bids = currentLeague.auctionState.currentBids;
+            
+            if (bids.length === 0) {
+                document.getElementById('leadingBidInfo').textContent = 'No bids yet';
+                document.getElementById('leadingBidder').textContent = '-';
+            } else {
+                const leadingBid = bids[bids.length - 1];
+                const team = currentLeague.teams.find(t => t.owner === leadingBid.owner);
+                document.getElementById('leadingBidInfo').innerHTML = `
+                    $${leadingBid.contract.capHit.toFixed(1)}M / ${leadingBid.contract.years.length}yr<br>
+                    <span style="font-size: 0.9rem; color: var(--text-dim);">Value: $${leadingBid.contractValue.toFixed(2)}M</span>
+                `;
+                document.getElementById('leadingBidder').textContent = team.teamName;
+            }
+
+            document.getElementById('auctionTimer').textContent = Math.ceil(currentLeague.auctionState.timeRemaining);
+        }
+
+        // FIX #2: Improved timer
+        function startAuctionTimer() {
+            console.log('Starting auction timer');
+            
+            if (activeTimers.auction) {
+                clearInterval(activeTimers.auction);
+            }
+
+            activeTimers.auction = setInterval(() => {
+                if (!currentLeague.auctionState || currentLeague.auctionState.status !== 'active') {
+                    console.log('Auction no longer active, stopping timer');
+                    clearInterval(activeTimers.auction);
+                    activeTimers.auction = null;
+                    return;
+                }
+
+                if (currentLeague.auctionState.paused || document.hidden) {
+                    console.log('Auction paused or hidden, not counting down');
+                    return; // Don't countdown when paused or tab hidden
+                }
+
+                currentLeague.auctionState.timeRemaining -= 0.1;
+                console.log('Time remaining:', currentLeague.auctionState.timeRemaining);
+                
+                if (currentLeague.auctionState.timeRemaining <= 0) {
+                    console.log('Time expired, completing auction');
+                    completeAuction();
+                } else {
+                    updateAuctionDisplay();
+                }
+            }, 100);
+        }
+
+        function renderBidBuilder() {
+            const el = document.getElementById('bidBuilder');
+            const bids = currentLeague.auctionState.currentBids;
+            const leadingValue = bids.length > 0 ? bids[bids.length - 1].contractValue : 0;
+            const isMobile = window.innerWidth <= 768;
+
+            el.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Total Contract Value ($M)</label>
+                    <input type="number" class="form-input" id="bidAmount" value="${Math.ceil(leadingValue + 1)}" min="1" step="0.5" oninput="updateBidPreview()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contract Length</label>
+                    <select class="form-select" id="bidYears" onchange="updateBidPreview()">
+                        <option value="1" ${!canSignContractLength(1) ? 'disabled' : ''}>1 Year ${getContractLimitText(1)}</option>
+                        <option value="2" ${!canSignContractLength(2) ? 'disabled' : ''}>2 Years ${getContractLimitText(2)}</option>
+                        <option value="3" ${canSignContractLength(3) ? 'selected' : 'disabled'}>3 Years ${getContractLimitText(3)}</option>
+                        <option value="4" ${!canSignContractLength(4) ? 'disabled' : ''}>4 Years ${getContractLimitText(4)}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Structure Type</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="bidStructure" value="flat" checked onchange="updateBidPreview()">
+                            <span>Flat</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bidStructure" value="increasing" onchange="updateBidPreview()">
+                            <span>Increasing</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bidStructure" value="decreasing" onchange="updateBidPreview()">
+                            <span>Decreasing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Guaranteed %</label>
+                    <input type="range" class="form-input" id="bidGuaranteed" min="0" max="100" value="50" step="10" oninput="updateBidPreview()">
+                    <div style="text-align: center; color: var(--accent); font-weight: 700; margin-top: 0.5rem;">
+                        <span id="bidGuaranteedDisplay">50</span>%
+                    </div>
+                </div>
+
+                <div style="background: var(--surface); padding: ${isMobile ? '0.75rem' : '1rem'}; border-radius: 8px; margin-top: ${isMobile ? '1rem' : '1.5rem'}; border: 2px solid var(--border);">
+                    <h4 style="color: var(--text-dim); margin-bottom: ${isMobile ? '0.75rem' : '1rem'}; text-align: center; font-size: ${isMobile ? '0.9rem' : '1rem'};">Contract Breakdown</h4>
+                    <div class="table-container" id="contractBreakdownTable"></div>
+                </div>
+
+                <div style="background: var(--primary-dark); padding: ${isMobile ? '0.75rem' : '1rem'}; border-radius: 6px; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: ${isMobile ? '0.85rem' : '1rem'};">
+                        <span style="font-weight: 700;">Total Contract Value:</span>
+                        <span style="font-weight: 700; color: var(--accent);" id="bidValueDisplay">$0.00M</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: ${isMobile ? '0.85rem' : '1rem'};">
+                        <span>Leading Bid to Beat:</span>
+                        <span style="font-weight: 700;" id="yourLeadingDisplay">${leadingValue > 0 ? '$' + leadingValue.toFixed(2) + 'M' : 'None'}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: ${isMobile ? '0.85rem' : '1rem'};">
+                        <span>Remaining Cap After:</span>
+                        <span style="font-weight: 700;" id="bidCapDisplay">$0.00M</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="placeBid()" style="width: 100%; margin-top: 1rem;">Place Bid</button>
+            `;
+
+            updateBidPreview();
+        }
+
+        function updateBidPreview() {
+            const amount = parseFloat(document.getElementById('bidAmount')?.value || 0);
+            const years = parseInt(document.getElementById('bidYears')?.value || 3);
+            const structure = document.querySelector('input[name="bidStructure"]:checked')?.value || 'flat';
+            const guaranteed = parseInt(document.getElementById('bidGuaranteed')?.value || 50);
+
+            document.getElementById('bidGuaranteedDisplay').textContent = guaranteed;
+
+            const contract = calculateContractValue(amount, years, structure, guaranteed);
+            
+            const tableEl = document.getElementById('contractBreakdownTable');
+            if (tableEl) {
+                let totalGuaranteed = 0;
+                let totalNonGuaranteed = 0;
+                
+                const tableHTML = `
+                    <table style="width: 100%; border-collapse: collapse; min-width: 500px;">
+                        <thead>
+                            <tr style="background: var(--primary-dark); border-bottom: 2px solid var(--accent);">
+                                <th style="padding: 0.75rem; text-align: center; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 0.85rem;">Year</th>
+                                <th style="padding: 0.75rem; text-align: right; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 0.85rem;">Total</th>
+                                <th style="padding: 0.75rem; text-align: right; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 0.85rem;">GTD</th>
+                                <th style="padding: 0.75rem; text-align: right; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 0.85rem;">Non-GTD</th>
+                                <th style="padding: 0.75rem; text-align: right; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; font-size: 0.85rem;">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${contract.years.map(year => {
+                                totalGuaranteed += year.guaranteedAmount;
+                                totalNonGuaranteed += year.nonGuaranteedAmount;
+                                return `
+                                    <tr style="border-bottom: 1px solid var(--border);">
+                                        <td style="padding: 0.75rem; text-align: center; font-weight: 700;">Y${year.year}</td>
+                                        <td style="padding: 0.75rem; text-align: right; font-weight: 600;">$${year.amount.toFixed(1)}M</td>
+                                        <td style="padding: 0.75rem; text-align: right; color: var(--success);">$${year.guaranteedAmount.toFixed(1)}M</td>
+                                        <td style="padding: 0.75rem; text-align: right; color: var(--warning);">$${year.nonGuaranteedAmount.toFixed(1)}M</td>
+                                        <td style="padding: 0.75rem; text-align: right; font-weight: 700; color: var(--accent);">$${year.weightedValue.toFixed(2)}M</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr style="background: var(--surface-light); border-top: 2px solid var(--accent);">
+                                <td style="padding: 0.75rem; text-align: center; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase;">Total</td>
+                                <td style="padding: 0.75rem; text-align: right; font-weight: 700;">$${amount.toFixed(1)}M</td>
+                                <td style="padding: 0.75rem; text-align: right; font-weight: 700; color: var(--success);">$${totalGuaranteed.toFixed(1)}M</td>
+                                <td style="padding: 0.75rem; text-align: right; font-weight: 700; color: var(--warning);">$${totalNonGuaranteed.toFixed(1)}M</td>
+                                <td style="padding: 0.75rem; text-align: right; font-weight: 800; color: var(--accent); font-size: 1.1rem;">$${contract.totalWeightedValue.toFixed(2)}M</td>
+                            </tr>
+                            <tr style="background: var(--surface-light);">
+                                <td colspan="5" style="padding: 0.75rem; text-align: center; font-size: 0.85rem; color: var(--text-dim);">
+                                    Avg: $${(amount / years).toFixed(2)}M/yr
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+                
+                tableEl.innerHTML = tableHTML;
+            }
+            
+            document.getElementById('bidValueDisplay').textContent = `$${contract.totalWeightedValue.toFixed(2)}M`;
+            document.getElementById('bidCapDisplay').textContent = `$${(currentLeague.salaryCap - currentTeam.usedCap - contract.capHit).toFixed(2)}M`;
+
+            const bids = currentLeague.auctionState.currentBids;
+            const yourLeadingBid = bids.find(b => b.owner === currentUser);
+            document.getElementById('yourLeadingDisplay').textContent = yourLeadingBid ? `$${yourLeadingBid.contractValue.toFixed(2)}M` : 'None';
+        }
+
+        function placeBid() {
+            const amount = parseFloat(document.getElementById('bidAmount').value);
+            const years = parseInt(document.getElementById('bidYears').value);
+            const structure = document.querySelector('input[name="bidStructure"]:checked').value;
+            const guaranteed = parseInt(document.getElementById('bidGuaranteed').value);
+
+            if (!canSignContractLength(years)) {
+                alert(`You have reached your limit for ${years}-year contracts!`);
+                return;
+            }
+
+            const contract = calculateContractValue(amount, years, structure, guaranteed);
+
+            if (currentTeam.usedCap + contract.capHit > currentLeague.salaryCap) {
+                alert('This contract would exceed your salary cap!');
+                return;
+            }
+
+            const bids = currentLeague.auctionState.currentBids;
+            const leadingValue = bids.length > 0 ? bids[bids.length - 1].contractValue : 0;
+
+            if (contract.totalWeightedValue <= leadingValue) {
+                alert(`Your bid value ($${contract.totalWeightedValue.toFixed(2)}M) must exceed the current leading bid ($${leadingValue.toFixed(2)}M)!`);
+                return;
+            }
+
+            const bid = {
+                owner: currentUser,
+                teamName: currentTeam.teamName,
+                contractValue: contract.totalWeightedValue,
+                contract: {
+                    ...contract,
+                    structure: structure,
+                    guaranteedPercent: guaranteed
+                }
+            };
+
+            currentLeague.auctionState.currentBids.push(bid);
+            
+            const maxTime = currentLeague.auctionSettings.maxTime;
+            const extension = currentLeague.auctionSettings.bidExtension;
+            currentLeague.auctionState.timeRemaining = Math.min(
+                currentLeague.auctionState.timeRemaining + extension,
+                maxTime
+            );
+
+            saveLeague();
+            updateAuctionDisplay();
+            renderBidBuilder();
+        }
+
+        // FIX #4: Validate contract limits before finalizing
+        function completeAuction() {
+            if (activeTimers.auction) {
+                clearInterval(activeTimers.auction);
+                activeTimers.auction = null;
+            }
+
+            const bids = currentLeague.auctionState.currentBids;
+            const player = currentLeague.auctionState.currentPlayer;
+
+            if (bids.length === 0) {
+                alert(`No bids for ${player.name}. Player returns to pool.`);
+                moveToNextNomination();
+                return;
+            }
+
+            const winningBid = bids[bids.length - 1];
+            const winningTeam = currentLeague.teams.find(t => t.owner === winningBid.owner);
+
+            // FIX #4: Validate contract limits before finalizing
+            const contractYears = winningBid.contract.years.length;
+            if (!canSignContractLength(contractYears, winningTeam)) {
+                alert(`${winningTeam.teamName} has reached their limit for ${contractYears}-year contracts! Bid is invalid. Player returns to pool.`);
+                moveToNextNomination();
+                return;
+            }
+
+            const signedPlayer = {
+                ...player,
+                contract: winningBid.contract
+            };
+
+            winningTeam.roster.push(signedPlayer);
+            winningTeam.usedCap += winningBid.contract.capHit;
+            // Player is automatically removed from available pool via getAvailablePlayers()
+
+            alert(`${player.name} signed by ${winningTeam.teamName} for $${winningBid.contract.capHit.toFixed(1)}M (Value: $${winningBid.contractValue.toFixed(2)}M)!`);
+
+            moveToNextNomination();
+        }
+
+        function moveToNextNomination() {
+            const rosterSettings = currentLeague.rosterSettings;
+            const maxRoster = rosterSettings.startingQB + rosterSettings.startingRB + 
+                             rosterSettings.startingWR + rosterSettings.startingTE + 
+                             rosterSettings.startingFLEX + rosterSettings.benchSize;
+
+            const allRostersFull = currentLeague.teams.every(t => t.roster.length >= maxRoster);
+            const availablePlayers = getAvailablePlayers();
+
+            if (allRostersFull || availablePlayers.length === 0) {
+                endAuction();
+                return;
+            }
+
+            currentLeague.auctionState.currentNominatorIndex = 
+                (currentLeague.auctionState.currentNominatorIndex + 1) % currentLeague.teams.length;
+            
+            currentLeague.auctionState.currentPlayer = null;
+            currentLeague.auctionState.currentBids = [];
+
+            saveLeague();
+            renderAuction();
+            promptNomination();
+        }
+
+        function endAuction() {
+            if (activeTimers.auction) {
+                clearInterval(activeTimers.auction);
+                activeTimers.auction = null;
+            }
+
+            currentLeague.auctionState = { status: 'completed' };
+            saveLeague();
+            
+            alert('Auction draft complete!');
+            showScreen('dashboard');
+        }
+
+        function renderDraftProgress() {
+            const el = document.getElementById('draftProgress');
+            const rosterSettings = currentLeague.rosterSettings;
+            const maxRoster = rosterSettings.startingQB + rosterSettings.startingRB + 
+                             rosterSettings.startingWR + rosterSettings.startingTE + 
+                             rosterSettings.startingFLEX + rosterSettings.benchSize;
+
+            el.innerHTML = currentLeague.teams.map(team => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--surface-light); border-radius: 6px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 700;">${team.teamName}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">$${team.usedCap.toFixed(1)}M / $${currentLeague.salaryCap}M</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; color: var(--accent);">${team.roster.length}/${maxRoster}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">players</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePause() {
+            if (currentLeague.commissioner !== currentUser) {
+                alert('Only the commissioner can pause/resume the auction');
+                return;
+            }
+
+            if (!currentLeague.auctionState || currentLeague.auctionState.status !== 'active') {
+                return;
+            }
+
+            currentLeague.auctionState.paused = !currentLeague.auctionState.paused;
+            saveLeague();
+            renderAuction();
+        }
+
+        // Helper function to save league
+        function saveLeague() {
+            const data = loadData();
+            const leagueIndex = data[currentUser].leagues.findIndex(l => l.id === currentLeague.id);
+            data[currentUser].leagues[leagueIndex] = currentLeague;
+            saveData(data);
+        }
+
+        // Free Agency
+        function renderFreeAgency() {
+            const availablePlayers = getAvailablePlayers();
+            const filtered = filterPlayers(availablePlayers, freeAgentSearchTerm, freeAgentPositionFilter);
+            const el = document.getElementById('freeAgentList');
+            
+            if (filtered.length === 0) {
+                el.innerHTML = '<p style="text-align: center; color: var(--text-dim); padding: 2rem;">No free agents match your filters!</p>';
+                return;
+            }
+
+            const displayPlayers = filtered.slice(0, 50);
+
+            el.innerHTML = displayPlayers.map(player => `
+                <div class="player-card" style="grid-template-columns: 2fr 1fr auto;">
+                    <div>
+                        <span class="player-name">${player.name}</span>
+                        <span class="player-position">${player.position}</span>
+                        ${player.age ? `<div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Age ${player.age}${player.yearsExp ? `, ${player.yearsExp} yrs exp` : ''}</div>` : ''}
+                    </div>
+                    <div style="color: var(--text-dim);">${player.team}</div>
+                    <button class="btn btn-secondary" onclick="alert('Free agency auction coming soon!')">Sign</button>
+                </div>
+            `).join('');
+        }
+
+        function filterFreeAgentsByPosition(position) {
+            freeAgentPositionFilter = position;
+            
+            document.querySelectorAll('#freeAgencyScreen .filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderFreeAgency();
+        }
+
+        function filterFreeAgents() {
+            freeAgentSearchTerm = document.getElementById('freeAgentSearch').value;
+            renderFreeAgency();
+        }
+
+        // Rookie Draft
+        function renderRookieDraft() {
+            const el = document.getElementById('rookieList');
+            el.innerHTML = mockRookies.map(player => `
+                <div class="player-card" style="grid-template-columns: 80px 2fr 1fr auto;">
+                    <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent);">
+                        #${player.draftPosition}
+                    </div>
+                    <div>
+                        <span class="player-name">${player.name}</span>
+                        <span class="player-position">${player.position}</span>
+                    </div>
+                    <div style="color: var(--text-dim);">${player.team}</div>
+                    <button class="btn btn-secondary" onclick="alert('Rookie draft coming soon!')">Draft</button>
+                </div>
+            `).join('');
+
+            document.getElementById('draftPick').textContent = '5';
+            document.getElementById('currentPick').textContent = '1';
+        }
+
+        // Trade System
+        let selectedTradePlayers = { yours: [], theirs: [] };
+
+        function renderTrades() {
+            const partnerSelect = document.getElementById('tradePartner');
+            partnerSelect.innerHTML = '<option value="">Select team...</option>' +
+                currentLeague.teams
+                    .filter(t => t.owner !== currentUser)
+                    .map(t => `<option value="${t.owner}">${t.teamName}</option>`)
+                    .join('');
+            
+            partnerSelect.onchange = () => {
+                selectedTradePlayers = { yours: [], theirs: [] };
+                updateTradeInterface();
+            };
+
+            updateTradeInterface();
+            renderTradeOffers();
+        }
+
+        function updateTradeInterface() {
+            const yourEl = document.getElementById('yourTradePlayers');
+            const theirEl = document.getElementById('theirTradePlayers');
+            const partner = document.getElementById('tradePartner').value;
+
+            yourEl.innerHTML = currentTeam.roster.length === 0 
+                ? '<p style="color: var(--text-dim); font-size: 0.9rem;">No players on roster</p>'
+                : currentTeam.roster.map(p => `
+                    <label style="display: flex; align-items: center; padding: 0.5rem; background: var(--surface-light); border-radius: 4px; margin-bottom: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" value="${p.id}" onchange="toggleTradePlayer('yours', ${p.id})" 
+                            ${selectedTradePlayers.yours.includes(p.id) ? 'checked' : ''}>
+                        <span style="margin-left: 0.75rem;">${p.name} - ${p.position} ($${p.contract.capHit.toFixed(1)}M)</span>
+                    </label>
+                `).join('');
+
+            if (!partner) {
+                theirEl.innerHTML = '<p style="color: var(--text-dim); font-size: 0.9rem;">Select a trade partner first</p>';
+                return;
+            }
+
+            const partnerTeam = currentLeague.teams.find(t => t.owner === partner);
+            theirEl.innerHTML = partnerTeam.roster.length === 0
+                ? '<p style="color: var(--text-dim); font-size: 0.9rem;">Partner has no players</p>'
+                : partnerTeam.roster.map(p => `
+                    <label style="display: flex; align-items: center; padding: 0.5rem; background: var(--surface-light); border-radius: 4px; margin-bottom: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" value="${p.id}" onchange="toggleTradePlayer('theirs', ${p.id})" 
+                            ${selectedTradePlayers.theirs.includes(p.id) ? 'checked' : ''}>
+                        <span style="margin-left: 0.75rem;">${p.name} - ${p.position} ($${p.contract.capHit.toFixed(1)}M)</span>
+                    </label>
+                `).join('');
+        }
+
+        function toggleTradePlayer(side, playerId) {
+            if (selectedTradePlayers[side].includes(playerId)) {
+                selectedTradePlayers[side] = selectedTradePlayers[side].filter(id => id !== playerId);
+            } else {
+                selectedTradePlayers[side].push(playerId);
+            }
+        }
+
+        function proposeTrade() {
+            const partner = document.getElementById('tradePartner').value;
+            
+            if (!partner) {
+                alert('Please select a trade partner');
+                return;
+            }
+
+            if (selectedTradePlayers.yours.length === 0 && selectedTradePlayers.theirs.length === 0) {
+                alert('Please select players to trade');
+                return;
+            }
+
+            const partnerTeam = currentLeague.teams.find(t => t.owner === partner);
+            
+            const yourPlayersOut = currentTeam.roster.filter(p => selectedTradePlayers.yours.includes(p.id));
+            const theirPlayersIn = partnerTeam.roster.filter(p => selectedTradePlayers.theirs.includes(p.id));
+            
+            const yourCapOut = yourPlayersOut.reduce((sum, p) => sum + p.contract.capHit, 0);
+            const yourCapIn = theirPlayersIn.reduce((sum, p) => sum + p.contract.capHit, 0);
+            const yourNewCap = currentTeam.usedCap - yourCapOut + yourCapIn;
+
+            const theirCapOut = theirPlayersIn.reduce((sum, p) => sum + p.contract.capHit, 0);
+            const theirCapIn = yourPlayersOut.reduce((sum, p) => sum + p.contract.capHit, 0);
+            const theirNewCap = partnerTeam.usedCap - theirCapOut + theirCapIn;
+
+            if (yourNewCap > currentLeague.salaryCap) {
+                alert('This trade would put you over the salary cap!');
+                return;
+            }
+
+            if (theirNewCap > currentLeague.salaryCap) {
+                alert('This trade would put your partner over the salary cap!');
+                return;
+            }
+
+            const trade = {
+                id: 'trade_' + Date.now(),
+                from: currentUser,
+                to: partner,
+                fromPlayers: selectedTradePlayers.yours,
+                toPlayers: selectedTradePlayers.theirs,
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            };
+
+            if (!currentLeague.trades) currentLeague.trades = [];
+            currentLeague.trades.push(trade);
+            saveLeague();
+
+            alert('Trade offer sent!');
+            selectedTradePlayers = { yours: [], theirs: [] };
+            renderTrades();
+        }
+
+        function renderTradeOffers() {
+            const el = document.getElementById('tradeOffers');
+            
+            if (!currentLeague.trades) currentLeague.trades = [];
+            
+            const relevantTrades = currentLeague.trades.filter(t => 
+                (t.from === currentUser || t.to === currentUser) && t.status === 'pending'
+            );
+
+            if (relevantTrades.length === 0) {
+                el.innerHTML = '<p style="color: var(--text-dim); text-align: center; padding: 2rem;">No active trade offers</p>';
+                return;
+            }
+
+            el.innerHTML = relevantTrades.map(trade => {
+                const isReceiver = trade.to === currentUser;
+                const otherUser = isReceiver ? trade.from : trade.to;
+                const otherTeam = currentLeague.teams.find(t => t.owner === otherUser);
+                
+                const fromTeam = currentLeague.teams.find(t => t.owner === trade.from);
+                const toTeam = currentLeague.teams.find(t => t.owner === trade.to);
+                
+                const fromPlayers = fromTeam.roster.filter(p => trade.fromPlayers.includes(p.id));
+                const toPlayers = toTeam.roster.filter(p => trade.toPlayers.includes(p.id));
+
+                return `
+                    <div class="card" style="background: var(--surface-light); padding: 1rem; margin-bottom: 1rem;">
+                        <h4 style="color: var(--accent); margin-bottom: 0.75rem;">${isReceiver ? 'Incoming' : 'Outgoing'} Trade</h4>
+                        <div style="color: var(--text-dim); margin-bottom: 1rem;">With: ${otherTeam.teamName}</div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+                            <div>
+                                <div style="font-weight: 700; margin-bottom: 0.5rem;">${fromTeam.teamName} sends:</div>
+                                ${fromPlayers.map(p => `<div style="font-size: 0.9rem;">• ${p.name} (${p.position})</div>`).join('')}
+                                ${fromPlayers.length === 0 ? '<div style="color: var(--text-dim); font-size: 0.9rem;">Nothing</div>' : ''}
+                            </div>
+                            <div style="color: var(--accent); font-size: 1.5rem;">⇄</div>
+                            <div>
+                                <div style="font-weight: 700; margin-bottom: 0.5rem;">${toTeam.teamName} sends:</div>
+                                ${toPlayers.map(p => `<div style="font-size: 0.9rem;">• ${p.name} (${p.position})</div>`).join('')}
+                                ${toPlayers.length === 0 ? '<div style="color: var(--text-dim); font-size: 0.9rem;">Nothing</div>' : ''}
+                            </div>
+                        </div>
+
+                        ${isReceiver ? `
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-primary" onclick="acceptTrade('${trade.id}')">Accept</button>
+                                <button class="btn btn-danger" onclick="declineTrade('${trade.id}')">Decline</button>
+                            </div>
+                        ` : `
+                            <button class="btn btn-danger" onclick="cancelTrade('${trade.id}')">Cancel Offer</button>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function acceptTrade(tradeId) {
+            const trade = currentLeague.trades.find(t => t.id === tradeId);
+            
+            const fromTeam = currentLeague.teams.find(t => t.owner === trade.from);
+            const toTeam = currentLeague.teams.find(t => t.owner === trade.to);
+            
+            const fromPlayers = fromTeam.roster.filter(p => trade.fromPlayers.includes(p.id));
+            const toPlayers = toTeam.roster.filter(p => trade.toPlayers.includes(p.id));
+            
+            fromTeam.roster = fromTeam.roster.filter(p => !trade.fromPlayers.includes(p.id));
+            toTeam.roster = toTeam.roster.filter(p => !trade.toPlayers.includes(p.id));
+            
+            fromTeam.roster.push(...toPlayers);
+            toTeam.roster.push(...fromPlayers);
+            
+            const fromCapOut = fromPlayers.reduce((sum, p) => sum + p.contract.capHit, 0);
+            const fromCapIn = toPlayers.reduce((sum, p) => sum + p.contract.capHit, 0);
+            fromTeam.usedCap = fromTeam.usedCap - fromCapOut + fromCapIn;
+            
+            const toCapOut = toPlayers.reduce((sum, p) => sum + p.contract.capHit, 0);
+            const toCapIn = fromPlayers.reduce((sum, p) => sum + p.contract.capHit, 0);
+            toTeam.usedCap = toTeam.usedCap - toCapOut + toCapIn;
+            
+            trade.status = 'accepted';
+            saveLeague();
+            
+            alert('Trade accepted!');
+            renderTrades();
+        }
+
+        function declineTrade(tradeId) {
+            const trade = currentLeague.trades.find(t => t.id === tradeId);
+            trade.status = 'declined';
+            saveLeague();
+            renderTrades();
+        }
+
+        function cancelTrade(tradeId) {
+            const trade = currentLeague.trades.find(t => t.id === tradeId);
+            trade.status = 'cancelled';
+            saveLeague();
+            renderTrades();
+        }
+
+        // Commissioner Functions
+        function renderCommissioner() {
+            if (currentLeague.commissioner !== currentUser) {
+                alert('You are not the commissioner of this league');
+                showScreen('dashboard');
+                return;
+            }
+
+            const rs = currentLeague.rosterSettings;
+            document.getElementById('commStartingQB').value = rs.startingQB;
+            document.getElementById('commStartingRB').value = rs.startingRB;
+            document.getElementById('commStartingWR').value = rs.startingWR;
+            document.getElementById('commStartingTE').value = rs.startingTE;
+            document.getElementById('commStartingFLEX').value = rs.startingFLEX;
+            document.getElementById('commBenchSize').value = rs.benchSize;
+
+            const cl = currentLeague.contractLimits;
+            document.getElementById('commMax4Year').value = cl.max4Year;
+            document.getElementById('commMax3Year').value = cl.max3Year;
+            document.getElementById('commMax2Year').value = cl.max2Year;
+            document.getElementById('commMax1Year').value = cl.max1Year;
+
+            const ss = currentLeague.scoringSettings;
+            document.getElementById('commPprFormat').value = ss.ppr;
+            document.getElementById('commPassingTD').value = ss.passingTD;
+            document.getElementById('commPassingYards').value = ss.passingYards;
+            document.getElementById('commRushingTD').value = ss.rushingTD;
+            document.getElementById('commRushingYards').value = ss.rushingYards;
+            document.getElementById('commReceivingTD').value = ss.receivingTD;
+            document.getElementById('commReceivingYards').value = ss.receivingYards;
+            document.getElementById('commInterceptions').value = ss.interceptions;
+            document.getElementById('commFumblesLost').value = ss.fumblesLost;
+
+            if (currentLeague.draftScheduled) {
+                document.getElementById('currentSchedule').style.display = 'block';
+                document.getElementById('currentScheduleTime').textContent = new Date(currentLeague.draftScheduled).toLocaleString();
+            } else {
+                document.getElementById('currentSchedule').style.display = 'none';
+            }
+
+            renderLeagueTeams();
+        }
+
+        function updateLeagueSettings() {
+            currentLeague.rosterSettings = {
+                startingQB: parseInt(document.getElementById('commStartingQB').value),
+                startingRB: parseInt(document.getElementById('commStartingRB').value),
+                startingWR: parseInt(document.getElementById('commStartingWR').value),
+                startingTE: parseInt(document.getElementById('commStartingTE').value),
+                startingFLEX: parseInt(document.getElementById('commStartingFLEX').value),
+                benchSize: parseInt(document.getElementById('commBenchSize').value)
+            };
+
+            currentLeague.contractLimits = {
+                max4Year: document.getElementById('commMax4Year').value,
+                max3Year: document.getElementById('commMax3Year').value,
+                max2Year: document.getElementById('commMax2Year').value,
+                max1Year: document.getElementById('commMax1Year').value
+            };
+
+            currentLeague.scoringSettings = {
+                ppr: parseFloat(document.getElementById('commPprFormat').value),
+                passingTD: parseFloat(document.getElementById('commPassingTD').value),
+                passingYards: parseFloat(document.getElementById('commPassingYards').value),
+                rushingTD: parseFloat(document.getElementById('commRushingTD').value),
+                rushingYards: parseFloat(document.getElementById('commRushingYards').value),
+                receivingTD: parseFloat(document.getElementById('commReceivingTD').value),
+                receivingYards: parseFloat(document.getElementById('commReceivingYards').value),
+                interceptions: parseFloat(document.getElementById('commInterceptions').value),
+                fumblesLost: parseFloat(document.getElementById('commFumblesLost').value)
+            };
+
+            saveLeague();
+            alert('League settings updated!');
+        }
+
+        function inviteTeam() {
+            const teamName = document.getElementById('inviteTeamName').value.trim();
+            
+            if (!teamName) {
+                alert('Please enter a team name');
+                return;
+            }
+
+            if (currentLeague.teams.length >= currentLeague.numTeams) {
+                alert('League is full!');
+                return;
+            }
+
+            const newTeam = {
+                owner: 'invited_' + Date.now(),
+                teamName: teamName,
+                roster: [],
+                usedCap: 0
+            };
+
+            currentLeague.teams.push(newTeam);
+            saveLeague();
+
+            document.getElementById('inviteTeamName').value = '';
+            alert(`Invitation sent to ${teamName}!`);
+            renderLeagueTeams();
+        }
+
+        function renderLeagueTeams() {
+            const el = document.getElementById('leagueTeamsList');
+            el.innerHTML = currentLeague.teams.map(t => `
+                <div style="padding: 0.75rem; background: var(--surface); border-radius: 6px; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 700;">${t.teamName}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim);">${t.roster.length} players • $${t.usedCap.toFixed(1)}M used</div>
+                    </div>
+                    ${t.owner === currentLeague.commissioner ? '<span class="badge badge-guaranteed">Commissioner</span>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function scheduleDraft() {
+            const dateTime = document.getElementById('draftDateTime').value;
+            
+            if (!dateTime) {
+                alert('Please select a date and time');
+                return;
+            }
+
+            const scheduledDate = new Date(dateTime);
+            if (scheduledDate <= new Date()) {
+                alert('Please select a future date and time');
+                return;
+            }
+
+            currentLeague.draftScheduled = dateTime;
+            saveLeague();
+            
+            alert('Draft scheduled for ' + scheduledDate.toLocaleString());
+            
+            document.getElementById('currentSchedule').style.display = 'block';
+            document.getElementById('currentScheduleTime').textContent = scheduledDate.toLocaleString();
+        }
+
+        function clearScheduledDraft() {
+            if (!confirm('Clear the scheduled draft time?')) return;
+            
+            currentLeague.draftScheduled = null;
+            saveLeague();
+            
+            cleanupAllTimers(); // FIX #6
+            
+            document.getElementById('currentSchedule').style.display = 'none';
+            alert('Scheduled draft cleared');
+        }
+
+        // Initialize Sleeper data when page loads
+        window.addEventListener('load', async () => {
+            console.log('App loading...');
+            await loadSleeperPlayers();
+            await loadSleeperNflState();
+            console.log('App ready! NFL players loaded.');
+        });
+    </script>
+</body>
+</html>
